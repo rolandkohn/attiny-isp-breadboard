@@ -58,6 +58,23 @@ The pinout assumes a standard Nano. Compare with the labels on your board before
 
 To reflash the Nano itself, pull it out of the breadboard first. With C2 in the circuit its own upload fails.
 
+## Cheap Nano clones (CH340, Windows)
+
+Most cheap Nanos use a CH340 USB chip. Two problems are common, both in step 1, before the breadboard is involved at all. Test with *Blink* first: if Blink uploads, ArduinoISP will too.
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| `can't set com-state for COMx` or the port won't open | The CH340 driver 4.0 (2026, also pushed by Windows Update) doesn't work with some clone chip batches | Install an older driver, see below |
+| `not in sync: resp=0x00` at `-b115200` | Clone has the old bootloader (57600 baud) | *Tools → Processor → ATmega328P (Old Bootloader)* |
+
+**Installing the older driver (v3.4):**
+
+1. Download [Windows-CH340-Driver.zip](https://cdn.sparkfun.com/assets/learn_tutorials/5/9/7/Windows-CH340-Driver.zip) from SparkFun's [CH340 guide](https://learn.sparkfun.com/tutorials/how-to-install-ch340-drivers/all) and unzip it. The WCH website only offers the newest version. Other signed versions are in the [Microsoft Update Catalog](https://www.catalog.update.microsoft.com) (search `wch.cn CH340`).
+2. Device Manager → *USB-SERIAL CH340* → *Update driver* → *Browse my computer* → *Let me pick from a list* → *Have Disk…* → select the `.inf` in the unzipped folder.
+3. Unplug, replug, upload Blink.
+
+If Windows Update brings back 4.0 later: Device Manager → driver → *Roll Back Driver* → reason *"My apps don't work with this driver"*. Windows then leaves the old driver alone.
+
 ## Checks
 
 Enable *File → Preferences → Show verbose output during: upload* so the IDE shows the avrdude messages.
