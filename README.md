@@ -15,14 +15,14 @@ Holes are named row a–j plus column 1–30. **Row j is at the top, a at the bo
 
 ## Parts
 
-| Part | Where |
-|---|---|
-| Arduino Nano | columns 1–15, USB to the left |
-| ATtiny84A | notch to the left, pin 1 on e20 (pins 1–7: e20–e26, pins 14–8: f20–f26) |
-| R1 10 kΩ | a23 → bottom + rail (reset pull-up) |
-| C1 100 nF | g20 (pin 14, GND) ↔ d20 (pin 1, VCC), legs bent over the chip end |
-| C2 10–100 µF electrolytic | + in b13 (Nano RST), − in b14 (Nano GND). Stays in permanently |
-| Test LED + 220–330 Ω (optional) | resistor i24 → i28, LED anode j28, cathode → top − rail |
+| Part | Where | Also ok |
+|---|---|---|
+| Arduino Nano | columns 1–15, USB to the left | Uno: same pins (D10–D13, 5V, GND), connected with jumper wires instead of sitting in the breadboard, C2 between the Uno's RESET and GND |
+| ATtiny84A | notch to the left, pin 1 on e20 (pins 1–7: e20–e26, pins 14–8: f20–f26) | ATtiny84, 44(A), 24(A): same pinout, select the chip in the IDE |
+| R1 10 kΩ | a23 → bottom + rail (reset pull-up) | 4k7–47 k |
+| C1 100 nF | g20 (pin 14, GND) ↔ d20 (pin 1, VCC), legs bent over the chip end | any ceramic 47 nF–1 µF |
+| C2 10–100 µF electrolytic | + in b13 (Nano RST), − in b14 (Nano GND). Stays in permanently | 4.7–220 µF, any voltage rating ≥ 6.3 V |
+| Test LED + 220–330 Ω (optional) | resistor i24 → i28, LED anode j28, cathode → top − rail | any LED colour, resistor 150 Ω–1 k (higher = dimmer) |
 
 ## Jumpers
 
