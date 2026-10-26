@@ -66,6 +66,7 @@ pre code{font-size:13px}
 h3{font-family:var(--font-display);font-weight:600;font-size:15px;margin:22px 0 8px}
 h3:first-of-type{margin-top:4px}
 .ok{color:#23994A;font-weight:600}
+.alt{font-family:var(--font-body);font-size:12px;color:var(--muted);margin-top:3px}
 @media (prefers-reduced-motion:no-preference){ #bb .wire{transition:opacity .2s} }
 </style>
 </head>
@@ -99,12 +100,12 @@ h3:first-of-type{margin-top:4px}
       <div class="tbl"><table>
         <thead><tr><th>Part</th><th>Where</th></tr></thead>
         <tbody>
-          <tr><td>Arduino Nano</td><td class="m">columns 1–15, pins in rows g and c<br>USB to the left</td></tr>
-          <tr><td>ATtiny84A</td><td class="m">notch to the left, pin 1 on e20<br>pins 1–7: e20–e26, pins 14–8: f20–f26</td></tr>
-          <tr><td>R1 10 kΩ</td><td class="m">a23 → bottom + rail</td></tr>
-          <tr><td>C1 100 nF</td><td class="m">g20 (pin 14, GND) ↔ d20 (pin 1, VCC)<br>bend the legs over the chip end</td></tr>
-          <tr><td>Test LED (optional)</td><td class="m">220–330 Ω: i24 → i28<br>LED: anode (long leg) j28, cathode → top − rail</td></tr>
-          <tr><td>C2 10–100 µF electrolytic</td><td class="m">+ in b13 (Nano RST), − in b14 (Nano GND)<br>stays in permanently</td></tr>
+          <tr><td>Arduino Nano</td><td class="m">columns 1–15, pins in rows g and c<br>USB to the left<div class="alt">Also ok: Uno, same pins via jumper wires, C2 between the Uno's RESET and GND</div></td></tr>
+          <tr><td>ATtiny84A</td><td class="m">notch to the left, pin 1 on e20<br>pins 1–7: e20–e26, pins 14–8: f20–f26<div class="alt">Also ok: ATtiny84, 44(A), 24(A), same pinout, select the chip in the IDE</div></td></tr>
+          <tr><td>R1 10 kΩ</td><td class="m">a23 → bottom + rail<div class="alt">Also ok: 4k7–47 k</div></td></tr>
+          <tr><td>C1 100 nF</td><td class="m">g20 (pin 14, GND) ↔ d20 (pin 1, VCC)<br>bend the legs over the chip end<div class="alt">Also ok: any ceramic 47 nF–1 µF</div></td></tr>
+          <tr><td>Test LED (optional)</td><td class="m">220–330 Ω: i24 → i28<br>LED: anode (long leg) j28, cathode → top − rail<div class="alt">Also ok: any LED colour, resistor 150 Ω–1 k (higher = dimmer)</div></td></tr>
+          <tr><td>C2 10–100 µF electrolytic</td><td class="m">+ in b13 (Nano RST), − in b14 (Nano GND)<br>stays in permanently<div class="alt">Also ok: 4.7–220 µF, any voltage rating ≥ 6.3 V</div></td></tr>
         </tbody>
       </table></div>
     </section>
