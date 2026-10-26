@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ATtiny84A Breadboard ISP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#ECEEE8; --panel:#F7F8F4; --fg:#1A1F1B; --muted:#5D655E; --line:#CDD2C8; --accent:#A8501E;
+  --bb:#F4F2EC; --bb-edge:#C9C4B6; --bb-hole:#3B3833; --bb-channel:#E2DED3; --bb-ink:#77705F;
+  --pcb:#1F4E8C; --pcb-edge:#143563; --pcb-ink:#EAF0FA;
+  --halo:#FFFFFF; --chip:#1D1D1D; --chip-ink:#D9D9D9;
+  --font-display:'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --font-body:'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono:'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#131713; --panel:#1A1F1B; --fg:#E5E9E2; --muted:#98A198; --line:#2C332D; --accent:#E68C57;
+  --bb:#D6D2C7; --bb-edge:#9F998A; --bb-hole:#2E2B27; --bb-channel:#C3BEB1; --bb-ink:#5E584A;
+  --pcb:#1C4682; --pcb-edge:#0F2A50; --pcb-ink:#E4ECF8;
+  --halo:#F2F2F2; --chip:#151515; --chip-ink:#CFCFCF; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#131713; --panel:#1A1F1B; --fg:#E5E9E2; --muted:#98A198; --line:#2C332D; --accent:#E68C57;
+  --bb:#D6D2C7; --bb-edge:#9F998A; --bb-hole:#2E2B27; --bb-channel:#C3BEB1; --bb-ink:#5E584A;
+  --pcb:#1C4682; --pcb-edge:#0F2A50; --pcb-ink:#E4ECF8;
+  --halo:#F2F2F2; --chip:#151515; --chip-ink:#CFCFCF; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15px;line-height:1.5;padding-inline:16px;padding-block:28px 48px}
+.wrap{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+header h1{font-family:var(--font-display);font-weight:800;font-size:clamp(26px,4vw,36px);letter-spacing:-.01em;margin:0;text-wrap:balance}
+header p{margin:6px 0 0;color:var(--muted);max-width:68ch}
+.eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+h2{font-family:var(--font-display);font-weight:600;font-size:18px;margin:0 0 12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;font:500 12px var(--font-mono);background:transparent;color:var(--fg);border:1px solid var(--line);border-radius:999px;padding:4px 10px 4px 7px;cursor:pointer}
+.chip i{width:12px;height:12px;border-radius:50%;display:inline-block;box-shadow:0 0 0 1.5px var(--line)}
+.chip[aria-pressed="true"]{border-color:var(--fg);background:color-mix(in srgb,var(--fg) 8%,transparent)}
+.chip:focus-visible,tr.click:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.boardbox{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:12px}
+#bb{display:block;width:100%;min-width:600px;max-width:860px;margin:0 auto;height:auto}
+.hint{font-size:13px;color:var(--muted);margin:10px 0 0}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+.grid2>*{min-width:0}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 11px var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+td.m,code{font-family:var(--font-mono);font-size:13px;font-variant-numeric:tabular-nums}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;box-shadow:0 0 0 1.5px var(--line)}
+tr.click{cursor:pointer}
+tr.click:hover td{background:color-mix(in srgb,var(--fg) 5%,transparent)}
+tr.dim td{opacity:.35}
+ol.steps{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:9px}
+ol.steps li{max-width:75ch}
+ol.steps b{font-weight:600}
+.note{border-left:3px solid var(--accent);padding:4px 0 4px 12px;font-size:14px;margin-top:14px}
+svg text{font-family:var(--font-mono)}
+pre{margin:10px 0 0;padding:12px 14px;background:color-mix(in srgb,var(--fg) 6%,var(--panel));border:1px solid var(--line);border-radius:8px;overflow-x:auto;font:13px/1.55 var(--font-mono)}
+pre code{font-size:13px}
+h3{font-family:var(--font-display);font-weight:600;font-size:15px;margin:22px 0 8px}
+h3:first-of-type{margin-top:4px}
+.ok{color:#23994A;font-weight:600}
+@media (prefers-reduced-motion:no-preference){ #bb .wire{transition:opacity .2s} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Arduino Nano as ISP · Breadboard</div>
+    <h1>Flash an ATtiny84A on a breadboard</h1>
+    <p>Nano and ATtiny sit in the same half-size breadboard (30 columns). No loose cables to the Arduino, just short jumpers, plus R1, C1 and the reset capacitor right next to the Nano. Once built, the breadboard stays a permanent programmer.</p>
+  </header>
+
+  <section class="card" aria-labelledby="h-draw">
+    <h2 id="h-draw">Layout</h2>
+    <div class="chips" id="chips" aria-label="Highlight signals"></div>
+    <div class="boardbox"><svg id="bb" role="img" aria-label="Breadboard layout: ATtiny84A with Arduino Nano as ISP"></svg></div>
+    <p class="note"><b>Check your power rails first.</b> On the breadboard used here both rail pairs run <b>− on top, + below</b> (top: − outer, + inner; bottom: − inner, + outer). Many breadboards are labelled the other way round. Go by the red/blue lines on <i>your</i> board and mirror the 5V/GND jumpers if needed, otherwise 5V lands on GND. Also check whether long breadboards have the rails split in the middle.</p>
+    <p class="hint">Top view, Nano with USB to the left and components facing up. Holes are named row a–j plus column 1–30, e.g. <code>b23</code>. Row j is at the top, a at the bottom. Hover a hole to see its name. Click a signal to highlight its jumper.</p>
+  </section>
+
+  <div class="grid2">
+    <section class="card" aria-labelledby="h-con">
+      <h2 id="h-con">Jumpers</h2>
+      <div class="tbl"><table>
+        <thead><tr><th>Nano</th><th>From → To</th><th>ATtiny</th></tr></thead>
+        <tbody id="ctab"></tbody>
+      </table></div>
+    </section>
+
+    <section class="card" aria-labelledby="h-parts">
+      <h2 id="h-parts">Parts</h2>
+      <div class="tbl"><table>
+        <thead><tr><th>Part</th><th>Where</th></tr></thead>
+        <tbody>
+          <tr><td>Arduino Nano</td><td class="m">columns 1–15, pins in rows g and c<br>USB to the left</td></tr>
+          <tr><td>ATtiny84A</td><td class="m">notch to the left, pin 1 on e20<br>pins 1–7: e20–e26, pins 14–8: f20–f26</td></tr>
+          <tr><td>R1 10 kΩ</td><td class="m">a23 → bottom + rail</td></tr>
+          <tr><td>C1 100 nF</td><td class="m">g20 (pin 14, GND) ↔ d20 (pin 1, VCC)<br>bend the legs over the chip end</td></tr>
+          <tr><td>Test LED (optional)</td><td class="m">220–330 Ω: i24 → i28<br>LED: anode (long leg) j28, cathode → top − rail</td></tr>
+          <tr><td>C2 10–100 µF electrolytic</td><td class="m">+ in b13 (Nano RST), − in b14 (Nano GND)<br>stays in permanently</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+  </div>
+
+  <section class="card" aria-labelledby="h-steps">
+    <h2 id="h-steps">Steps</h2>
+    <ol class="steps">
+      <li><b>Prepare the Nano once</b>, outside the breadboard, USB only: upload <code>File → Examples → 11.ArduinoISP → ArduinoISP</code>. Clones with a CH340 usually need processor <code>ATmega328P (Old Bootloader)</code>, otherwise the upload fails. The sketch stays on the Nano until you upload something else.</li>
+      <li><b>Populate the breadboard</b>: ATtiny, the jumpers from the table, R1, C1 and electrolytic C2 (long leg + in b13, stripe − in b14). C2 stays in.</li>
+      <li><b>Plug in the Nano</b> and connect USB. From now on the breadboard is a dedicated programmer.</li>
+      <li><b>Flash the ATtiny</b> with <a href="https://github.com/SpenceKonde/ATTinyCore">ATTinyCore</a>: board <code>ATtiny24/44/84(a) (No bootloader)</code>, chip <code>ATtiny84(a)</code>, clock <code>8 MHz (internal)</code>, programmer <code>Arduino as ISP</code>. For every new chip run <b>Burn Bootloader</b> once (sets the fuses), then <b>Sketch → Upload Using Programmer</b>.</li>
+    </ol>
+    <p class="note">If the Nano itself needs reflashing (e.g. ArduinoISP got overwritten and you only get <code>not in sync</code>): pull the Nano out of the breadboard and start again at step 1. It does not work with C2 in the circuit.</p>
+    <p class="note">For all checks below: enable <b>File → Preferences → Show verbose output during: upload</b>. Otherwise the IDE hides the avrdude messages.</p>
+    <p class="note">The pinout assumes a standard Nano. Compare with the labels on your board before plugging in: top D12 … D2, GND, RST, RX0, TX1; bottom D13, 3V3, REF, A0–A7, 5V, RST, GND, VIN.</p>
+  </section>
+
+  <section class="card" aria-labelledby="h-check">
+    <h2 id="h-check">Check</h2>
+
+    <h3>1 · Nano: is ArduinoISP running?</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>Check</th><th>How</th><th>Good if</th></tr></thead>
+      <tbody>
+        <tr><td>Upload log</td><td>output after the ArduinoISP upload</td><td class="m">… bytes of flash verified</td></tr>
+        <tr><td>Sketch responds</td><td>Serial Monitor, 19200 baud, "No line ending", send <code>1</code> followed by a space</td><td class="m">reply contains <span class="ok">AVR ISP</span></td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>2 · Whole chain: Nano + jumpers + ATtiny</h3>
+    <p style="margin:0">Always first: <b>Tools → Burn Bootloader</b>. It reads the chip signature and sets the fuses.</p>
+<pre><code>avrdude: Device signature = 0x1e930c (probably t84)
+...
+avrdude: 1 bytes of lfuse verified</code></pre>
+    <div class="tbl" style="margin-top:10px"><table>
+      <thead><tr><th>Output</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td class="m"><span class="ok">0x1e930c</span></td><td>All good, that is the ATtiny84A signature</td></tr>
+        <tr><td class="m">0x000000</td><td>Chip does not answer. Check jumpers, 5V/GND and RESET (D10 → b23)</td></tr>
+        <tr><td class="m">0xffffff</td><td>Usually MISO (j1 → j26) in the wrong hole or a loose contact</td></tr>
+        <tr><td class="m">not in sync</td><td>The Nano is the problem: ArduinoISP missing, C2 missing or wrong COM port</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>3 · ATtiny: is the sketch on it and running?</h3>
+    <p style="margin:0"><b>Verify:</b> after <b>Sketch → Upload Using Programmer</b> avrdude reads the flash back and compares. <code>… bytes of flash verified</code> without errors means the code is on the chip correctly.</p>
+    <p><b>Function test:</b> plug in the test LED (drawn top right in the layout) and upload <a href="../firmware/blink_pa3/blink_pa3.ino"><code>blink_pa3</code></a>.</p>
+<pre><code>i24 (pin 10, PA3) ──[220–330 Ω]── i28
+j28 ── LED anode (long leg)
+LED cathode ── top − rail</code></pre>
+<pre><code>void setup() { pinMode(PIN_PA3, OUTPUT); }
+void loop() {
+  digitalWrite(PIN_PA3, HIGH); delay(500);
+  digitalWrite(PIN_PA3, LOW);  delay(500);
+}</code></pre>
+    <div class="tbl" style="margin-top:10px"><table>
+      <thead><tr><th>LED</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td class="m"><span class="ok">1 s per cycle</span></td><td>Sketch runs, fuses are correctly set to 8 MHz</td></tr>
+        <tr><td class="m">8 s per cycle</td><td>Burn Bootloader was skipped: the chip runs at the factory 1 MHz</td></tr>
+        <tr><td class="m">dark</td><td>Sketch not running or LED reversed (long leg = anode = resistor side)</td></tr>
+      </tbody>
+    </table></div>
+    <p class="hint">PA3 is not an ISP pin, so the LED can stay plugged in and does not disturb flashing. After the upload the Nano releases RESET, R1 pulls it high, and the ATtiny starts running right on the breadboard.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+const NS='http://www.w3.org/2000/svg';
+const svg=document.getElementById('bb');
+const P=20, BX=40, BY=30;
+const W=BX+660+44, H=BY+420;
+const ROW={tp:20,tn:40,a:75,b:95,c:115,d:135,e:155,f:215,g:235,h:255,i:275,j:295,bn:330,bp:350};
+const RL=['a','b','c','d','e','f','g','h','i','j'];
+const LBL={a:'j',b:'i',c:'h',d:'g',e:'f',f:'e',g:'d',h:'c',i:'b',j:'a'}; /* displayed: j at the top, a at the bottom */
+const bx=c=>BX+30+(c-1)*P, by=r=>BY+ROW[r];
+let focus=null;
+
+const NETS={
+  vcc:{c:'#D62839',n:'5V'},
+  gnd:{c:'#1E1E1E',n:'GND'},
+  rst:{c:'#EE8A1E',n:'D10 · RESET'},
+  mosi:{c:'#2563D9',n:'D11 · MOSI'},
+  miso:{c:'#23994A',n:'D12 · MISO'},
+  sck:{c:'#8B3FD0',n:'D13 · SCK'}
+};
+const TOP=['D12','D11','D10','D9','D8','D7','D6','D5','D4','D3','D2','GND','RST','RX0','TX1'];
+const BOT=['D13','3V3','REF','A0','A1','A2','A3','A4','A5','A6','A7','5V','RST','GND','VIN'];
+const USED=new Set(['t0','t1','t2','t11','b0','b11','b12','b13']);
+
+const WIRES=[
+  {n:'miso',p:[[bx(1),by('a')],[bx(1),BY+82],[bx(26),BY+82],[bx(26),by('a')]], from:'D12', path:'j1 → j26', tiny:'pin 8 · MISO'},
+  {n:'mosi',p:[[bx(2),by('b')],[bx(2),BY+101],[bx(18),BY+101],[bx(18),BY+245],[bx(26),BY+245],[bx(26),by('g')]], from:'D11', path:'i2 → d26', tiny:'pin 7 · MOSI'},
+  {n:'rst', p:[[bx(3),by('c')],[bx(3),BY+119],[bx(17),BY+119],[bx(17),BY+265],[bx(23),BY+265],[bx(23),by('i')]], from:'D10', path:'h3 → b23', tiny:'pin 4 · RESET'},
+  {n:'sck', p:[[bx(1),by('j')],[bx(1),BY+400],[BX+680,BY+400],[BX+680,BY+119],[bx(25),BY+119],[bx(25),by('d')]], from:'D13', path:'a1 → g25 (around the outside)', tiny:'pin 9 · SCK'},
+  {n:'vcc', p:[[bx(12),by('j')],[bx(12),by('bp')]], from:'5V', path:'a12 → bottom + rail', tiny:'feeds pin 1 via a20'},
+  {n:'vcc', p:[[bx(20),by('j')],[bx(20),by('bp')]], from:'—', path:'a20 → bottom + rail', tiny:'pin 1 · VCC'},
+  {n:'gnd', p:[[bx(14),by('j')],[bx(14),by('bn')]], from:'GND', path:'a14 → bottom − rail', tiny:'optional, currently unused'},
+  {n:'gnd', p:[[bx(12),by('a')],[bx(12),by('tp')]], from:'GND', path:'j12 → top − rail', tiny:'feeds pin 14 via j20'},
+  {n:'gnd', p:[[bx(20),by('a')],[bx(20),by('tp')]], from:'—', path:'j20 → top − rail', tiny:'pin 14 · GND'}
+];
+
+function el(t,a,par){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);(par||svg).appendChild(e);return e;}
+function tx(par,x,y,s,o){o=o||{};const t=el('text',{x:x,y:y,'text-anchor':o.a||'middle','dominant-baseline':'central','font-size':o.s||9,'font-weight':o.w||400,fill:o.f||'var(--bb-ink)'},par);
+  if(o.op)t.setAttribute('opacity',o.op);t.textContent=s;return t;}
+function rp(pts,r){let d='M'+pts[0][0]+' '+pts[0][1];
+  for(let i=1;i<pts.length-1;i++){const[x0,y0]=pts[i-1],[x1,y1]=pts[i],[x2,y2]=pts[i+1];
+    const d1=Math.hypot(x1-x0,y1-y0),d2=Math.hypot(x2-x1,y2-y1),rr=Math.min(r,d1/2,d2/2);
+    d+=' L'+(x1+(x0-x1)/d1*rr)+' '+(y1+(y0-y1)/d1*rr)+' Q'+x1+' '+y1+' '+(x1+(x2-x1)/d2*rr)+' '+(y1+(y2-y1)/d2*rr);}
+  const l=pts[pts.length-1];return d+' L'+l[0]+' '+l[1];}
+
+function render(){
+  svg.innerHTML='';svg.setAttribute('viewBox','0 0 '+W+' '+H);
+  /* breadboard */
+  const g=el('g',{});
+  el('rect',{x:BX,y:BY,width:660,height:370,rx:8,fill:'var(--bb)',stroke:'var(--bb-edge)','stroke-width':1.5},g);
+  el('rect',{x:BX+20,y:BY+175,width:620,height:20,rx:3,fill:'var(--bb-channel)'},g);
+  [[BY+8,'#2F6BD8'],[BY+52,'#D62839'],[BY+318,'#2F6BD8'],[BY+362,'#D62839']].forEach(([y,c])=>el('line',{x1:BX+22,y1:y,x2:BX+638,y2:y,stroke:c,'stroke-width':1.6},g));
+  tx(g,BX+12,by('tp'),'−',{s:12,f:'#2F6BD8',w:600});tx(g,BX+12,by('tn'),'+',{s:12,f:'#D62839',w:600});
+  tx(g,BX+12,by('bn'),'−',{s:12,f:'#2F6BD8',w:600});tx(g,BX+12,by('bp'),'+',{s:12,f:'#D62839',w:600});
+  const hole=(x,y,name)=>{const h=el('rect',{x:x-3,y:y-3,width:6,height:6,rx:1,fill:'var(--bb-hole)'},g);el('title',{},h).textContent=name;};
+  for(let c=1;c<=30;c++){
+    RL.forEach(r=>hole(bx(c),by(r),LBL[r]+c));
+    [['tp','top − rail'],['tn','top + rail'],['bn','bottom − rail'],['bp','bottom + rail']].forEach(([r,n])=>hole(bx(c),by(r),n));
+  }
+  RL.forEach(r=>{tx(g,BX+14,by(r),LBL[r]);tx(g,BX+646,by(r),LBL[r]);});
+  [1,5,10,15,20,25,30].forEach(c=>{tx(g,bx(c),BY+60,String(c),{s:8});tx(g,bx(c),BY+311,String(c),{s:8});});
+
+  /* ATtiny84A */
+  const xL=bx(20)-11,xR=bx(26)+11;
+  for(let c=20;c<=26;c++){
+    el('rect',{x:bx(c)-3,y:by('e')-3,width:6,height:10,fill:'#B8BEC2'},g);
+    el('rect',{x:bx(c)-3,y:by('f')-7,width:6,height:10,fill:'#B8BEC2'},g);}
+  el('rect',{x:xL,y:by('e')+5,width:xR-xL,height:by('f')-by('e')-10,rx:3,fill:'var(--chip)'},g);
+  el('path',{d:'M'+xL+' '+(BY+177)+' A8 8 0 0 1 '+xL+' '+(BY+193)+' Z',fill:'var(--bb-channel)'},g);
+  for(let k=0;k<7;k++){tx(g,bx(20+k),BY+203,String(k+1),{s:7,f:'var(--chip-ink)'});tx(g,bx(20+k),BY+167,String(14-k),{s:7,f:'var(--chip-ink)'});}
+  tx(g,(xL+xR)/2+4,BY+185,'ATtiny84A',{s:10,w:600,f:'var(--chip-ink)'});
+
+  /* C1 directly across pin 14 (GND) and pin 1 (VCC), body left of the chip */
+  {const cx=bx(19)+1,cy=BY+185;
+   el('polyline',{points:bx(20)+','+by('d')+' '+bx(20)+','+(BY+150)+' '+cx+','+(cy-8),fill:'none',stroke:'#9AA2A6','stroke-width':1.8,'stroke-linejoin':'round'},g);
+   el('polyline',{points:bx(20)+','+by('g')+' '+bx(20)+','+(BY+220)+' '+cx+','+(cy+8),fill:'none',stroke:'#9AA2A6','stroke-width':1.8,'stroke-linejoin':'round'},g);
+   el('ellipse',{cx:cx,cy:cy,rx:7,ry:11,fill:'#D99A2B',stroke:'#8A5A10'},g);
+   el('rect',{x:bx(20)-3,y:by('d')-3,width:6,height:6,fill:'#9AA2A6'},g);
+   el('rect',{x:bx(20)-3,y:by('g')-3,width:6,height:6,fill:'#9AA2A6'},g);
+   tx(g,cx,by('d')-1,'C1',{s:8,w:600,f:'#7A4C0A'});}
+
+  /* test LED (optional) on PA3 */
+  {const t=el('g',{opacity:.9},g);
+   el('line',{x1:bx(24),y1:by('b'),x2:bx(28),y2:by('b'),stroke:'#9AA2A6','stroke-width':1.8},t);
+   el('rect',{x:bx(26)-22,y:by('b')-5,width:44,height:10,rx:4,fill:'#E2CFA8',stroke:'#8D7A55'},t);
+   [['#E67E22',-14],['#E67E22',-6],['#7B4A1E',2],['#C9A227',14]].forEach(([c,dx])=>el('rect',{x:bx(26)+dx-1.6,y:by('b')-5,width:3.2,height:10,fill:c},t));
+   [bx(24),bx(28)].forEach(x=>el('rect',{x:x-3,y:by('b')-3,width:6,height:6,fill:'#9AA2A6'},t));
+   const lx=bx(28)+10,ly=BY+57;
+   el('line',{x1:bx(28),y1:by('a'),x2:lx-3,y2:ly+4,stroke:'#9AA2A6','stroke-width':1.6},t);
+   el('line',{x1:bx(29),y1:by('tp'),x2:lx+3,y2:ly-4,stroke:'#9AA2A6','stroke-width':1.6},t);
+   el('circle',{cx:lx,cy:ly,r:7.5,fill:'#E0352B',stroke:'rgba(0,0,0,.45)'},t);
+   el('line',{x1:lx+2,y1:ly-6.5,x2:lx+7,y2:ly-1.5,stroke:'rgba(0,0,0,.6)','stroke-width':2},t);
+   tx(t,bx(26),by('b')+11,'test LED · 220–330 Ω (optional)',{s:7.5,w:600});}
+
+  /* R1 reset pull-up */
+  el('line',{x1:bx(23),y1:by('j'),x2:bx(23),y2:by('bp'),stroke:'#9AA2A6','stroke-width':1.8},g);
+  el('rect',{x:bx(23)-5,y:BY+300,width:10,height:44,rx:4,fill:'#E2CFA8',stroke:'#8D7A55'},g);
+  [['#7B4A1E',BY+308],['#111',BY+316],['#E67E22',BY+324],['#C9A227',BY+336]].forEach(([c,y])=>el('rect',{x:bx(23)-5,y:y-1.6,width:10,height:3.2,fill:c},g));
+  tx(g,bx(23)+10,BY+322,'R1 10k',{a:'start',s:8,w:600});
+
+  /* Arduino Nano */
+  const u=el('g',{});
+  const nx0=bx(1)-28,nx1=bx(15)+26,ny0=by('d')-12,ny1=by('h')+12;
+  el('rect',{x:nx0,y:ny0,width:nx1-nx0,height:ny1-ny0,rx:4,fill:'var(--pcb)',stroke:'var(--pcb-edge)','stroke-width':1.5},u);
+  el('rect',{x:nx0-14,y:BY+170,width:34,height:30,rx:3,fill:'#C5CACD',stroke:'#8F969A'},u);
+  {const cx=bx(9),cy=BY+185;el('rect',{x:cx-17,y:cy-17,width:34,height:34,fill:'var(--chip)',transform:'rotate(45 '+cx+' '+cy+')'},u);}
+  el('rect',{x:bx(5)-9,y:BY+178,width:18,height:14,rx:2,fill:'#D9D9D9',stroke:'#999'},u);
+  el('circle',{cx:bx(5),cy:BY+185,r:4,fill:'#333'},u);
+  for(let i=0;i<15;i++){
+    [['t',by('d'),TOP],['b',by('h'),BOT]].forEach(([s,y,L])=>{
+      el('rect',{x:bx(i+1)-4,y:y-4,width:8,height:8,fill:'#D4AF37'},u);
+      const used=USED.has(s+i);
+      tx(u,bx(i+1),s==='t'?y+14:y-14,L[i],{s:used?7.5:6.5,w:used?600:400,f:'var(--pcb-ink)',op:used?1:.6});
+    });
+  }
+  tx(u,bx(12.5),BY+185,'Arduino Nano',{s:12,w:600,f:'var(--pcb-ink)',op:.9});
+
+  /* C2 on Nano RST/GND */
+  {const cx=bx(15)+8,cy=BY+303,r=15;
+   el('line',{x1:bx(13),y1:by('i'),x2:cx-8,y2:cy-4,stroke:'#9AA2A6','stroke-width':1.8},g);
+   el('line',{x1:bx(14),y1:by('i'),x2:cx+2,y2:cy-8,stroke:'#9AA2A6','stroke-width':1.8},g);
+   el('circle',{cx:cx,cy:cy,r:r,fill:'#2D4F8E',stroke:'#1C3460'},g);
+   el('path',{d:'M'+(cx+r*.5)+' '+(cy-r*.866)+' A'+r+' '+r+' 0 0 1 '+(cx+r*.5)+' '+(cy+r*.866)+' Z',fill:'#9DB4DE'},g);
+   tx(g,cx-5,cy,'+',{s:10,w:600,f:'#FFFFFF'});tx(g,cx+10,cy,'−',{s:10,w:600,f:'#1C3460'});
+   tx(g,cx+20,cy+2,'C2 10–100µF',{a:'start',s:8,w:600});}
+
+  /* jumpers */
+  const gw=el('g',{});
+  WIRES.forEach(w=>{
+    const gg=el('g',{class:'wire',opacity:(focus&&focus!==w.n)?.1:1},gw);
+    const d=rp(w.p,10), short=w.p.length===2;
+    el('path',{d:d,fill:'none',stroke:'var(--halo)','stroke-width':short?6:7,'stroke-linecap':'round','stroke-linejoin':'round',opacity:.85},gg);
+    el('path',{d:d,fill:'none',stroke:NETS[w.n].c,'stroke-width':short?3:3.6,'stroke-linecap':'round','stroke-linejoin':'round'},gg);
+    [w.p[0],w.p[w.p.length-1]].forEach(([x,y])=>el('rect',{x:x-3.5,y:y-3.5,width:7,height:7,rx:1.5,fill:NETS[w.n].c,stroke:'var(--halo)','stroke-width':1.2},gg));
+  });
+}
+
+const chips=document.getElementById('chips');
+const mk=(k,label,color)=>{const b=document.createElement('button');b.className='chip';if(k)b.dataset.net=k;b.setAttribute('aria-pressed',k?'false':'true');b.innerHTML=(color?'<i style="background:'+color+'"></i>':'')+label;chips.appendChild(b);};
+mk('','All');Object.entries(NETS).forEach(([k,v])=>mk(k,v.n,v.c));
+function setFocus(n){focus=(n&&focus!==n)?n:null;
+  chips.querySelectorAll('.chip').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.net?b.dataset.net===focus:focus===null)));
+  document.querySelectorAll('#ctab tr').forEach(r=>r.classList.toggle('dim',!!focus&&r.dataset.net!==focus));render();}
+chips.addEventListener('click',e=>{const b=e.target.closest('.chip');if(b)setFocus(b.dataset.net||null);});
+
+const ct=document.getElementById('ctab');
+ct.innerHTML=WIRES.map(w=>'<tr class="click" tabindex="0" data-net="'+w.n+'"><td class="m"><span class="dot" style="background:'+NETS[w.n].c+'"></span>'+w.from+'</td><td class="m">'+w.path+'</td><td>'+w.tiny+'</td></tr>').join('');
+ct.addEventListener('click',e=>{const r=e.target.closest('tr.click');if(r)setFocus(r.dataset.net);});
+ct.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const r=e.target.closest('tr.click');if(r){e.preventDefault();setFocus(r.dataset.net);}}});
+
+render();
+})();
+</script>
+</body>
+</html>
