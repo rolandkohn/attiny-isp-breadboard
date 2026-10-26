@@ -8,6 +8,9 @@ Used to flash the chips for [ATinyCrawl](https://github.com/rolandkohn/ATinyCraw
 
 Interactive version with signal highlighting and the full check guide: [`docs/index.html`](docs/index.html).
 
+> [!WARNING]
+> **Check your power rails before plugging anything in.** On the breadboard used here both rail pairs run **− on top, + below** (top pair: − outer, + inner; bottom pair: − inner, + outer). Many breadboards have them the other way round. Go by the red/blue lines on *your* board and mirror the 5V/GND jumpers if needed, otherwise 5V ends up on GND. Long breadboards often split the rails in the middle, too.
+
 Holes are named row a–j plus column 1–30. **Row j is at the top, a at the bottom**, as printed on the breadboard used here. If yours is labelled the other way round, go by the picture.
 
 ## Parts
