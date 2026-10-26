@@ -124,6 +124,25 @@ h3:first-of-type{margin-top:4px}
     <p class="note">The pinout assumes a standard Nano. Compare with the labels on your board before plugging in: top D12 … D2, GND, RST, RX0, TX1; bottom D13, 3V3, REF, A0–A7, 5V, RST, GND, VIN.</p>
   </section>
 
+  <section class="card" aria-labelledby="h-ch340">
+    <h2 id="h-ch340">Cheap Nano clones (CH340, Windows)</h2>
+    <p style="margin:0">Most cheap Nanos use a CH340 USB chip. Two problems are common, both in step 1, before the breadboard is involved at all. Test with <i>Blink</i> first: if Blink uploads, ArduinoISP will too.</p>
+    <div class="tbl" style="margin-top:10px"><table>
+      <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td class="m">can't set com-state for COMx<br>port won't open</td><td>The CH340 driver 4.0 (2026, also pushed by Windows Update) doesn't work with some clone chip batches</td><td>Install an older driver, see below</td></tr>
+        <tr><td class="m">not in sync: resp=0x00<br>at -b115200</td><td>Clone has the old bootloader (57600 baud)</td><td><code>Tools → Processor → ATmega328P (Old Bootloader)</code></td></tr>
+      </tbody>
+    </table></div>
+    <h3>Installing the older driver (v3.4)</h3>
+    <ol class="steps">
+      <li>Download <a href="https://cdn.sparkfun.com/assets/learn_tutorials/5/9/7/Windows-CH340-Driver.zip">Windows-CH340-Driver.zip</a> from SparkFun's <a href="https://learn.sparkfun.com/tutorials/how-to-install-ch340-drivers/all">CH340 guide</a> and unzip it. The WCH website only offers the newest version. Other signed versions are in the <a href="https://www.catalog.update.microsoft.com">Microsoft Update Catalog</a> (search <code>wch.cn CH340</code>).</li>
+      <li>Device Manager → <i>USB-SERIAL CH340</i> → <i>Update driver</i> → <i>Browse my computer</i> → <i>Let me pick from a list</i> → <i>Have Disk…</i> → select the <code>.inf</code> in the unzipped folder.</li>
+      <li>Unplug, replug, upload Blink.</li>
+    </ol>
+    <p class="note">If Windows Update brings back 4.0 later: Device Manager → driver → <i>Roll Back Driver</i> → reason <i>"My apps don't work with this driver"</i>. Windows then leaves the old driver alone.</p>
+  </section>
+
   <section class="card" aria-labelledby="h-check">
     <h2 id="h-check">Check</h2>
 
